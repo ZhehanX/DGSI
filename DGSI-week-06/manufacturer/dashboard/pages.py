@@ -16,7 +16,7 @@ from dashboard.components.orders_panel import render_orders_panel
 from dashboard.components.actions_panel import render_actions_panel
 from dashboard.components.event_log import render_event_log
 
-API_BASE = "http://localhost:8000"
+API_BASE = "http://localhost:8002"
 
 
 def _api(method: str, path: str, **kwargs) -> requests.Response:

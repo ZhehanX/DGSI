@@ -1,5 +1,6 @@
 """Application settings and configuration."""
 from functools import lru_cache
+from pathlib import Path
 from pydantic_settings import BaseSettings
 from typing import Optional
 
@@ -27,7 +28,7 @@ class Settings(BaseSettings):
     # Seed data
     SEED_SAMPLE_DATA: bool = True
 
-    PROVIDERS_JSON_PATH: str = "app/data/providers.json"
+    PROVIDERS_JSON_PATH: str = str(Path(__file__).parent.parent / "data" / "providers.json")
 
     class Config:
         env_file = ".env"
