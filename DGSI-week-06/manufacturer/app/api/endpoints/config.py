@@ -10,6 +10,7 @@ from app.api.dependencies import get_current_active_user
 from app.models.user import User
 from app.models.product import ProductModel, BOMItem
 from app.models.purchase_order import Supplier, SupplierProduct
+from app.services.provider_client import ProviderClient
 
 router = APIRouter(prefix="/api/config", tags=["configuration"])
 
@@ -143,12 +144,27 @@ def _serialize_model(model: ProductModel) -> dict:
 
 
 def _serialize_supplier(supplier: Supplier) -> dict:
-    return {
-        "id": supplier.id,
-        "name": supplier.name,
-        "lead_time_days": supplier.lead_time_days,
-        "active": supplier.active,
-        "products": [
+    products = []
+    if supplier.is_external and supplier.api_url:
+        try:
+            client = ProviderClient(supplier.api_url)
+            external_catalog = client.get_catalog()
+            for p in external_catalog:
+                products.append({
+                    "id": p["id"],
+                    "product_name": p["name"],
+                    "base_unit_cost": float(p["pricing_tiers"][-1]["unit_price"]) if p["pricing_tiers"] else 0.0,
+                    "packaging_unit": "units",
+                    "packaging_qty": 1,
+                    "discount_tiers": [
+                        {"min_qty": t["min_quantity"], "discount_pct": 0.0} # Placeholder for tiers
+                        for t in p["pricing_tiers"]
+                    ],
+                })
+        except Exception as e:
+            print(f"Error fetching catalog for {supplier.name}: {e}")
+    else:
+        products = [
             {
                 "id": p.id,
                 "product_name": p.product_name,
@@ -158,5 +174,12 @@ def _serialize_supplier(supplier: Supplier) -> dict:
                 "discount_tiers": json.loads(p.discount_tiers) if p.discount_tiers else [],
             }
             for p in supplier.products
-        ],
+        ]
+
+    return {
+        "id": supplier.id,
+        "name": supplier.name,
+        "lead_time_days": supplier.lead_time_days,
+        "active": supplier.active,
+        "products": products,
     }

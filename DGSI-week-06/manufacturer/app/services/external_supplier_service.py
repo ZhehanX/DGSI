@@ -50,7 +50,7 @@ class ExternalSupplierService:
         client = ProviderClient(supplier.api_url)
         return client.get_catalog()
 
-    def place_order(self, supplier_name: str, product_id: int, quantity: int) -> PurchaseOrder:
+    def place_order(self, supplier_name: str, product_ref: str | int, quantity: int) -> PurchaseOrder:
         supplier = self.db.query(Supplier).filter(Supplier.name == supplier_name, Supplier.is_external == True).first()
         if not supplier:
             raise ValueError(f"External supplier {supplier_name} not found")
@@ -58,10 +58,18 @@ class ExternalSupplierService:
         client = ProviderClient(supplier.api_url)
         # We need the product name from the catalog to match our local material name
         catalog = client.get_catalog()
-        product = next((p for p in catalog if p["id"] == product_id), None)
+        
+        product = None
+        if isinstance(product_ref, int):
+            product = next((p for p in catalog if p["id"] == product_ref), None)
+        else:
+            # Flexible matching by name (case-insensitive partial match)
+            product = next((p for p in catalog if product_ref.lower() in p["name"].lower()), None)
+            
         if not product:
-            raise ValueError(f"Product ID {product_id} not found in supplier catalog")
+            raise ValueError(f"Product '{product_ref}' not found in supplier catalog")
 
+        product_id = product["id"]
         # Place order on Provider API
         # The buyer name can be something like "Manufacturer App" or from config
         remote_order = client.place_order(buyer="Manufacturer App", product_id=product_id, quantity=quantity)

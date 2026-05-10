@@ -5,13 +5,23 @@ from app.services.provider_service import ProviderService
 from app.services.seed import seed_provider_data
 import uvicorn
 
-app = typer.Typer()
-orders_app = typer.Typer()
+app = typer.Typer(help="Provider Management CLI - Orchestrate supply, orders, and simulation time.")
+orders_app = typer.Typer(help="Manage and view purchase orders received from manufacturers.")
+day_app = typer.Typer(help="Control the simulated passage of time.")
+price_app = typer.Typer(help="Manage product pricing and volume discount tiers.")
+
 app.add_typer(orders_app, name="orders")
+app.add_typer(day_app, name="day")
+app.add_typer(price_app, name="price")
 
 @app.command()
 def seed():
-    """Seed the provider database with initial data."""
+    """
+    Seed the provider database with initial data.
+    
+    Creates default products (PCBs, Motors, Extruders), initial stock levels,
+    and standard pricing tiers. This should be run once before starting the simulation.
+    """
     init_db()
     db = SessionLocal()
     try:
@@ -21,7 +31,12 @@ def seed():
 
 @app.command()
 def catalog():
-    """List products in the catalog."""
+    """
+    List all products in the provider's catalog.
+    
+    Displays product IDs, names, lead times (in days), and all active
+    pricing tiers (volume discounts).
+    """
     db = SessionLocal()
     service = ProviderService(db)
     products = service.get_catalog()
@@ -33,7 +48,11 @@ def catalog():
 
 @app.command()
 def stock():
-    """Show current provider inventory."""
+    """
+    Show current provider inventory levels.
+    
+    Lists the quantity available for every product in the catalog.
+    """
     db = SessionLocal()
     service = ProviderService(db)
     stocks = service.get_stock()
@@ -43,7 +62,11 @@ def stock():
 
 @orders_app.command("list")
 def list_orders(status: str = None):
-    """List all orders."""
+    """
+    List all orders received by the provider.
+    
+    Optional: Filter by status (e.g., PENDING, CONFIRMED, SHIPPED, DELIVERED).
+    """
     db = SessionLocal()
     service = ProviderService(db)
     orders = service.get_orders(status=status)
@@ -53,7 +76,11 @@ def list_orders(status: str = None):
 
 @orders_app.command("show")
 def show_order(order_id: int):
-    """Show order details."""
+    """
+    Show detailed information for a specific order.
+    
+    Displays full order state, including pricing, status, and delivery dates.
+    """
     db = SessionLocal()
     service = ProviderService(db)
     o = service.get_order(order_id)
@@ -73,34 +100,67 @@ def show_order(order_id: int):
 
 @app.command()
 def restock(product_id: int, quantity: int):
-    """Add stock to a product."""
+    """
+    Manually add stock to a product.
+    
+    Increments the current inventory level for the specified product ID.
+    """
     db = SessionLocal()
     service = ProviderService(db)
     service.restock(product_id, quantity)
     typer.echo(f"Added {quantity} to product {product_id}")
     db.close()
 
-@app.command("day-advance")
+@day_app.command("advance")
 def day_advance():
-    """Advance simulated time."""
+    """
+    Advance the simulated time by one day.
+    
+    This command processes all active orders, moving them through the
+    fulfillment pipeline (PENDING -> CONFIRMED -> SHIPPED -> DELIVERED).
+    """
     db = SessionLocal()
     service = ProviderService(db)
     new_day = service.advance_day()
     typer.echo(f"Advanced to day {new_day}")
     db.close()
 
-@app.command("day-current")
+@day_app.command("current")
 def day_current():
-    """Show current day."""
+    """
+    Show the current simulation day.
+    """
     db = SessionLocal()
     service = ProviderService(db)
     day = service.get_current_day()
     typer.echo(f"Current Day: {day}")
     db.close()
 
+@price_app.command("set")
+def set_price(product_id: int, min_quantity: int, unit_price: float):
+    """
+    Update or create a pricing tier for a product.
+    
+    Defines the unit price for a given minimum order quantity.
+    """
+    from decimal import Decimal
+    db = SessionLocal()
+    service = ProviderService(db)
+    try:
+        service.set_price(product_id, min_quantity, Decimal(str(unit_price)))
+        typer.echo(f"Updated product {product_id} tier {min_quantity} to {unit_price}€")
+    except Exception as e:
+        typer.echo(f"Error: {e}")
+    finally:
+        db.close()
+
 @app.command()
 def serve(port: int = 8001):
-    """Start the Provider API."""
+    """
+    Start the Provider REST API server.
+    
+    Default port is 8001. Use this to allow the manufacturer to place orders.
+    """
     uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True)
 
 if __name__ == "__main__":

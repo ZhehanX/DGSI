@@ -134,6 +134,26 @@ class ProviderService:
     def get_order(self, order_id: int) -> Optional[Order]:
         return self.db.query(Order).filter(Order.id == order_id).first()
 
+    def set_price(self, product_id: int, min_quantity: int, unit_price: Decimal):
+        product = self.db.query(Product).filter(Product.id == product_id).first()
+        if not product:
+            raise ValueError("Product not found")
+        
+        tier = self.db.query(PricingTier).filter(
+            PricingTier.product_id == product_id,
+            PricingTier.min_quantity == min_quantity
+        ).first()
+        
+        if tier:
+            tier.unit_price = unit_price
+        else:
+            tier = PricingTier(product_id=product_id, min_quantity=min_quantity, unit_price=unit_price)
+            self.db.add(tier)
+        
+        current_day = self.get_current_day()
+        self.log_event(current_day, "PRICE_UPDATE", "Product", product_id, f"Set tier {min_quantity} to {unit_price}€")
+        self.db.commit()
+
     # --- Events ---
     def log_event(self, sim_day: int, event_type: str, entity_type: str = None, entity_id: int = None, detail: str = None):
         event = Event(

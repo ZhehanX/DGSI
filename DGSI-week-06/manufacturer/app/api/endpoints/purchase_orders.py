@@ -12,6 +12,7 @@ from app.api.dependencies import get_current_active_user
 from app.models.user import User
 from app.models.event import EventLog
 from app.models.purchase_order import PurchaseOrder, Supplier, SupplierProduct
+from app.services.external_supplier_service import ExternalSupplierService
 
 router = APIRouter(prefix="/api/purchase-orders", tags=["purchase-orders"])
 
@@ -70,6 +71,15 @@ def create_purchase_order(
     supplier = db.query(Supplier).filter(Supplier.id == body.supplier_id).first()
     if not supplier:
         raise HTTPException(status_code=404, detail=f"Supplier #{body.supplier_id} not found")
+
+    if supplier.is_external:
+        service = ExternalSupplierService(db)
+        try:
+            # For external suppliers, we use the product name directly as a reference
+            po = service.place_order(supplier.name, body.product_name, int(body.quantity))
+            return _serialize(po, db)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
 
     sup_product = db.query(SupplierProduct).filter(
         SupplierProduct.supplier_id == body.supplier_id,
