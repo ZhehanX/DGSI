@@ -79,7 +79,7 @@ def render_header(get_fn, post_fn, user: dict) -> None:
                 0,
             )
             st.markdown(
-                f'<p style="color:#64748B;font-size:11px;margin-top:18px">'
+                f'<p style="color:var(--fg-muted);font-size:11px;margin-top:18px">'
                 f'Last shift: {demand} demand events &nbsp;|&nbsp; {produced} units produced'
                 f'</p>',
                 unsafe_allow_html=True,

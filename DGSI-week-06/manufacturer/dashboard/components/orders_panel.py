@@ -83,7 +83,7 @@ def render_orders_panel(get_fn, post_fn) -> None:
 
     if not orders:
         st.markdown(
-            '<p style="color:#475569;font-size:12px;padding:16px 0">No orders match this filter.</p>',
+            '<p style="color:var(--fg-muted);font-size:12px;padding:16px 0">No orders match this filter.</p>',
             unsafe_allow_html=True,
         )
         return

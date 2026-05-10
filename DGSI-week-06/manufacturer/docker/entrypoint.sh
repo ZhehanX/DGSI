@@ -21,8 +21,8 @@ print('Database initialized with sample data.')
 "
 fi
 
-echo "Starting FastAPI server on port 8000..."
-PYTHONPATH=. uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+echo "Starting FastAPI server on port 8002..."
+PYTHONPATH=. uvicorn app.main:app --host 0.0.0.0 --port 8002 &
 
 echo "Starting Streamlit dashboard on port 8501..."
 PYTHONPATH=. streamlit run dashboard/pages.py --server.address=0.0.0.0 --server.port=8501 &

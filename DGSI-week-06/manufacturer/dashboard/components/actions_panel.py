@@ -5,22 +5,22 @@ import streamlit as st
 
 def _po_list_html(pos: list) -> str:
     if not pos:
-        return '<p style="color:#475569;font-size:11px">No pending POs.</p>'
+        return '<p style="color:var(--fg-muted);font-size:11px">No pending POs.</p>'
     rows = []
     for po in pos[:8]:
         due = (po.get("expected_delivery") or "")[:10]
-        status_color = "#F59E0B" if po["status"] == "partial" else "#3B82F6"
+        status_color = "#F59E0B" if po["status"] == "partial" else "#60A5FA"
         rows.append(
             f'<div style="display:flex;justify-content:space-between;'
-            f'padding:5px 0;border-bottom:1px solid rgba(51,65,85,0.3);'
+            f'padding:5px 0;border-bottom:1px solid var(--border-soft);'
             f'font-size:11px;">'
-            f'<span style="color:#94A3B8;font-family:\'Fira Code\',monospace">#{po["id"]:04d}</span>'
-            f'<span style="color:#CBD5E1;flex:1;margin:0 8px">{po["product_name"]}</span>'
-            f'<span style="color:#64748B;font-family:\'Fira Code\',monospace">'
+            f'<span style="color:var(--fg-muted);font-family:\'Fira Code\',monospace">#{po["id"]:04d}</span>'
+            f'<span style="color:var(--fg-secondary);flex:1;margin:0 8px">{po["product_name"]}</span>'
+            f'<span style="color:var(--fg-tertiary);font-family:\'Fira Code\',monospace">'
             f'{po["quantity_ordered"]:.0f}</span>'
             f'<span style="color:{status_color};margin-left:8px;font-size:9px;'
             f'font-weight:700">{po["status"].upper()}</span>'
-            f'<span style="color:#334155;margin-left:8px">{due}</span>'
+            f'<span style="color:var(--fg-muted);margin-left:8px">{due}</span>'
             f'</div>'
         )
     return "".join(rows)
@@ -67,7 +67,7 @@ def render_actions_panel(get_fn, post_fn) -> None:
             suppliers, supplier_map = [], {}
 
         if not suppliers:
-            st.markdown('<p style="color:#475569;font-size:11px">No suppliers configured.</p>',
+            st.markdown('<p style="color:var(--fg-muted);font-size:11px">No suppliers configured.</p>',
                         unsafe_allow_html=True)
         else:
             # We move selectboxes OUTSIDE the form to enable reactivity (dependent dropdowns)

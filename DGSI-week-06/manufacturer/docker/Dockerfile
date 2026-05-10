@@ -29,7 +29,7 @@ COPY --chown=appuser:appuser ../sample_data ./sample_data
 
 RUN mkdir -p /app/data && chown appuser:appuser /app/data
 
-EXPOSE 8000 8501
+EXPOSE 8002 8501
 
 COPY --chown=appuser:appuser ../docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

@@ -3,22 +3,22 @@ import streamlit as st
 from typing import Optional
 
 _EVENT_COLORS = {
-    "day_advanced":         ("#5E6AD2", "rgba(94,106,210,0.12)"),
-    "demand_generated":     ("#94A3B8", "rgba(148,163,184,0.10)"),
-    "demand_batch":         ("#94A3B8", "rgba(148,163,184,0.10)"),
-    "order_released":       ("#22C55E", "rgba(34,197,94,0.12)"),
-    "order_cancelled":      ("#EF4444", "rgba(239,68,68,0.12)"),
-    "order_completed":      ("#22C55E", "rgba(34,197,94,0.12)"),
-    "order_created_manual": ("#3B82F6", "rgba(59,130,246,0.12)"),
-    "material_consumed":    ("#F59E0B", "rgba(245,158,11,0.12)"),
-    "po_created":           ("#3B82F6", "rgba(59,130,246,0.12)"),
-    "po_arrived":           ("#22C55E", "rgba(34,197,94,0.12)"),
-    "po_partial_delivery":  ("#F59E0B", "rgba(245,158,11,0.12)"),
-    "po_cancelled":         ("#EF4444", "rgba(239,68,68,0.12)"),
-    "inventory_snapshot":   ("#475569", "rgba(71,85,105,0.12)"),
-    "inventory_adjustment": ("#F59E0B", "rgba(245,158,11,0.12)"),
+    "day_advanced":         ("#818CF8", "rgba(129,140,248,0.15)"),
+    "demand_generated":     ("#94A3B8", "rgba(148,163,184,0.12)"),
+    "demand_batch":         ("#94A3B8", "rgba(148,163,184,0.12)"),
+    "order_released":       ("#4ADE80", "rgba(74,222,128,0.15)"),
+    "order_cancelled":      ("#F87171", "rgba(248,113,113,0.15)"),
+    "order_completed":      ("#4ADE80", "rgba(74,222,128,0.15)"),
+    "order_created_manual": ("#60A5FA", "rgba(96,165,250,0.15)"),
+    "material_consumed":    ("#FB923C", "rgba(251,146,60,0.15)"),
+    "po_created":           ("#60A5FA", "rgba(96,165,250,0.15)"),
+    "po_arrived":           ("#4ADE80", "rgba(74,222,128,0.15)"),
+    "po_partial_delivery":  ("#FB923C", "rgba(251,146,60,0.15)"),
+    "po_cancelled":         ("#F87171", "rgba(248,113,113,0.15)"),
+    "inventory_snapshot":   ("#94A3B8", "rgba(148,163,184,0.12)"),
+    "inventory_adjustment": ("#FB923C", "rgba(251,146,60,0.15)"),
 }
-_DEFAULT_COLOR = ("#64748B", "rgba(100,116,139,0.10)")
+_DEFAULT_COLOR = ("#94A3B8", "rgba(148,163,184,0.12)")
 
 
 def _event_row_html(event: dict) -> str:
@@ -71,13 +71,13 @@ def render_event_log(get_fn, page_size: int = 25, event_type: Optional[str] = No
 
     if not events:
         st.markdown(
-            '<p style="color:#475569;font-size:12px;padding:8px 0">No events yet. Advance the simulation to generate events.</p>',
+            '<p style="color:var(--fg-muted);font-size:12px;padding:8px 0">No events yet. Advance the simulation to generate events.</p>',
             unsafe_allow_html=True,
         )
         return
 
     st.markdown(
-        f'<p style="color:#334155;font-size:10px;margin-bottom:6px">'
+        f'<p style="color:var(--fg-muted);font-size:10px;margin-bottom:6px">'
         f'Showing {len(events)} of {total} events</p>',
         unsafe_allow_html=True,
     )

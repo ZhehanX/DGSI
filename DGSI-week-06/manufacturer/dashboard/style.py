@@ -3,12 +3,12 @@
 Design tokens (from ui-ux-pro-max, style: Data-Dense Dashboard + Dark Mode):
   --bg-base:     #0F172A  (deep slate — factory floor concrete at night)
   --bg-card:     #1E293B  (card surface — slightly lighter)
-  --bg-muted:    #1A1E2F  (input/inset — darker than card, signals "type here")
-  --border:      #334155  (standard border — low contrast, structural only)
+  --bg-muted:    #1A1E2F  (input/inset — darker than card)
+  --border:      #475569  (standard border — higher contrast)
   --fg-primary:  #F8FAFC  (primary text)
-  --fg-secondary:#CBD5E1  (supporting text)
-  --fg-tertiary: #94A3B8  (metadata)
-  --fg-muted:    #64748B  (disabled/placeholder)
+  --fg-secondary:#E2E8F0  (supporting text)
+  --fg-tertiary: #CBD5E1  (metadata)
+  --fg-muted:    #94A3B8  (disabled/secondary metadata)
   --accent:      #F59E0B  (amber — industrial alert + filament color)
   --success:     #22C55E  (running/delivered/completed)
   --danger:      #EF4444  (fault/cancelled/critical)
@@ -25,41 +25,41 @@ _CSS = """
   --bg-base: #0F172A;
   --bg-card: #1E293B;
   --bg-muted: #1A1E2F;
-  --border: #334155;
-  --border-soft: rgba(51,65,85,0.45);
+  --border: #475569;
+  --border-soft: rgba(71, 85, 105, 0.4);
   --fg-primary: #F8FAFC;
-  --fg-secondary: #CBD5E1;
-  --fg-tertiary: #94A3B8;
-  --fg-muted: #64748B;
+  --fg-secondary: #E2E8F0;
+  --fg-tertiary: #CBD5E1;
+  --fg-muted: #94A3B8;
   --accent: #F59E0B;
-  --accent-muted: rgba(245,158,11,0.12);
+  --accent-muted: rgba(245,158,11,0.15);
   --success: #22C55E;
-  --success-muted: rgba(34,197,94,0.12);
+  --success-muted: rgba(34,197,94,0.15);
   --danger: #EF4444;
-  --danger-muted: rgba(239,68,68,0.12);
+  --danger-muted: rgba(239,68,68,0.15);
   --info: #3B82F6;
-  --info-muted: rgba(59,130,246,0.12);
+  --info-muted: rgba(59,130,246,0.15);
   --warning: #F59E0B;
-  --warning-muted: rgba(245,158,11,0.12);
+  --warning-muted: rgba(245,158,11,0.15);
   --r-sm: 4px;
   --r-md: 6px;
   --r-lg: 10px;
 }
 
 /* ── Global typography ── */
-html, body, .stApp, [data-testid="stAppViewContainer"],
-.stMarkdown, .stText, p, li, span, label {
+html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
   font-family: 'Fira Sans', sans-serif !important;
+  color: var(--fg-secondary) !important;
 }
 
-[data-testid="stMetricValue"],
-[data-testid="stMetricDelta"],
-code, pre, .stCode {
-  font-family: 'Fira Code', monospace !important;
+/* Specific text elements - removed !important from global to allow specific overrides */
+.stMarkdown, .stText, p, li, span, label {
+  font-family: 'Fira Sans', sans-serif !important;
+  color: var(--fg-secondary);
 }
 
 /* ── App background ── */
-.stApp, [data-testid="stAppViewContainer"] {
+.stApp, [data-testid="stAppViewContainer"], [data-testid="stApp"], .main {
   background-color: var(--bg-base) !important;
 }
 
@@ -69,7 +69,7 @@ code, pre, .stCode {
 }
 
 /* ── Dividers ── */
-hr { border-color: var(--border) !important; opacity: 0.6 !important; }
+hr { border-color: var(--border) !important; opacity: 0.8 !important; }
 
 /* ── Headings ── */
 h1, h2, h3, h4 {
@@ -80,7 +80,7 @@ h1, h2, h3, h4 {
 h1 { font-size: 20px !important; font-weight: 600 !important; }
 h2 { font-size: 14px !important; font-weight: 600 !important;
      text-transform: uppercase; letter-spacing: 0.06em !important;
-     color: var(--fg-tertiary) !important; }
+     color: var(--fg-secondary) !important; }
 h3 { font-size: 13px !important; font-weight: 600 !important; }
 
 /* ── Metrics ── */
@@ -99,11 +99,15 @@ h3 { font-size: 13px !important; font-weight: 600 !important; }
   font-weight: 600 !important;
   letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
-  color: var(--fg-muted) !important;
+  color: var(--fg-tertiary) !important;
 }
 
 /* ── Buttons ── */
-.stButton > button {
+
+/* 1. Global Button Defaults (Primary Style: Amber/Dark) */
+.stApp button, 
+[data-testid*="stButton"] button, 
+[data-testid="stFormSubmitButton"] button {
   background-color: var(--accent) !important;
   color: #0F172A !important;
   border: none !important;
@@ -111,31 +115,58 @@ h3 { font-size: 13px !important; font-weight: 600 !important; }
   font-family: 'Fira Sans', sans-serif !important;
   font-weight: 600 !important;
   font-size: 12px !important;
-  letter-spacing: 0.02em !important;
   transition: background 150ms ease-out !important;
+  min-height: 38px !important;
 }
-.stButton > button:hover {
+
+/* Force dark text for ALL elements inside primary buttons */
+.stApp button *, 
+[data-testid*="stButton"] button *, 
+[data-testid="stFormSubmitButton"] button * {
+  color: #0F172A !important;
+}
+
+.stApp button:hover, 
+[data-testid*="stButton"] button:hover, 
+[data-testid="stFormSubmitButton"] button:hover {
   background-color: #D97706 !important;
 }
-.stButton > button[kind="secondary"] {
+
+/* 2. Secondary Variants (Dark background / Light text) */
+/* Targets kind="secondary", kind="secondaryFormSubmit", etc. */
+.stApp button[kind*="secondary"], [data-testid*="stButton"] button[kind*="secondary"] {
   background-color: var(--bg-card) !important;
-  color: var(--fg-secondary) !important;
   border: 1px solid var(--border) !important;
 }
-.stButton > button[kind="secondary"]:hover {
+
+/* Force light text for ALL elements inside secondary buttons */
+.stApp button[kind*="secondary"] *, [data-testid*="stButton"] button[kind*="secondary"] * {
+  color: var(--fg-primary) !important;
+}
+
+.stApp button[kind*="secondary"]:hover, [data-testid*="stButton"] button[kind*="secondary"]:hover {
   background-color: #263347 !important;
 }
 
+
+
 /* ── Inputs ── */
-.stTextInput > div > div > input,
-.stNumberInput > div > div > input,
-.stTextArea textarea {
+.stTextInput input,
+.stNumberInput input,
+.stTextArea textarea,
+[data-testid="stTextInput"] input,
+[data-testid="stNumberInput"] input {
   background-color: var(--bg-muted) !important;
   border: 1px solid var(--border) !important;
-  color: var(--fg-primary) !important;
+  color: #F8FAFC !important; /* Force visible white text */
   border-radius: var(--r-sm) !important;
   font-family: 'Fira Sans', sans-serif !important;
   font-size: 13px !important;
+}
+
+/* Global input text color fallback */
+input, textarea {
+  color: #F8FAFC !important;
 }
 .stTextInput > div > div > input:focus,
 .stNumberInput > div > div > input:focus {
@@ -169,7 +200,7 @@ h3 { font-size: 13px !important; font-weight: 600 !important; }
   background: var(--bg-card) !important;
 }
 .stExpander summary {
-  color: var(--fg-secondary) !important;
+  color: var(--fg-primary) !important;
   font-size: 13px !important;
 }
 
@@ -188,8 +219,7 @@ h3 { font-size: 13px !important; font-weight: 600 !important; }
 /* ── Remove "press enter to submit" hint ── */
 [data-testid="stFormSubmitButton"] + div,
 [data-testid="stFormSubmitButton"] + p,
-[data-testid="stForm"] div[data-testid="stMarkdownContainer"] p small,
-.stForm p {
+[data-testid="stForm"] div[data-testid="stMarkdownContainer"] p small {
   display: none !important;
 }
 
@@ -206,13 +236,13 @@ div.stFormSubmitButton + div {
   align-items: center;
   gap: 10px;
   padding: 7px 0;
-  border-bottom: 1px solid rgba(51,65,85,0.3);
+  border-bottom: 1px solid var(--border-soft);
 }
 .bin-row:last-child { border-bottom: none; }
 .bin-name {
   font-family: 'Fira Code', monospace;
   font-size: 10px;
-  color: #94A3B8;
+  color: var(--fg-tertiary);
   width: 120px;
   flex-shrink: 0;
   overflow: hidden;
@@ -234,7 +264,7 @@ div.stFormSubmitButton + div {
 .bin-avail {
   font-family: 'Fira Code', monospace;
   font-size: 11px;
-  color: #F8FAFC;
+  color: var(--fg-primary);
   font-weight: 600;
   width: 36px;
   text-align: right;
@@ -242,7 +272,7 @@ div.stFormSubmitButton + div {
 .bin-total {
   font-family: 'Fira Code', monospace;
   font-size: 10px;
-  color: #475569;
+  color: var(--fg-muted);
   width: 36px;
 }
 .bin-badge {
@@ -270,13 +300,13 @@ div.stFormSubmitButton + div {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #64748B;
+  color: var(--fg-tertiary);
 }
 .warehouse-pct {
   font-family: 'Fira Code', monospace;
   font-size: 12px;
   font-weight: 600;
-  color: #F8FAFC;
+  color: var(--fg-primary);
 }
 .warehouse-track {
   height: 3px;
@@ -304,24 +334,24 @@ div.stFormSubmitButton + div {
   transition: background 150ms;
   cursor: default;
 }
-.order-row:hover { background: rgba(30,41,59,1); }
+.order-row:hover { background: rgba(30,41,59,1); border-color: var(--border); }
 .order-id {
   font-family: 'Fira Code', monospace;
   font-size: 10px;
-  color: #475569;
+  color: var(--fg-muted);
   width: 36px;
   flex-shrink: 0;
 }
 .order-model {
   font-size: 12px;
   font-weight: 500;
-  color: #CBD5E1;
+  color: var(--fg-secondary);
   flex: 1;
 }
 .order-qty {
   font-family: 'Fira Code', monospace;
   font-size: 11px;
-  color: #94A3B8;
+  color: var(--fg-tertiary);
   width: 32px;
   text-align: right;
   flex-shrink: 0;
@@ -353,7 +383,7 @@ div.stFormSubmitButton + div {
 .status-released         { background: rgba(59,130,246,0.15); color: #3B82F6; }
 .status-waiting_materials{ background: rgba(239,68,68,0.15);  color: #EF4444; }
 .status-completed        { background: rgba(34,197,94,0.15);  color: #22C55E; }
-.status-cancelled        { background: rgba(100,116,139,0.15);color: #64748B; }
+.status-cancelled        { background: rgba(148,163,184,0.15);color: #94A3B8; }
 .status-failed           { background: rgba(239,68,68,0.15);  color: #EF4444; }
 
 /* Order counter bar */
@@ -377,13 +407,14 @@ div.stFormSubmitButton + div {
   display: block;
   line-height: 1;
   margin-bottom: 3px;
+  color: var(--fg-primary);
 }
 .count-label {
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #64748B;
+  color: var(--fg-tertiary);
 }
 
 /* Event log rows */
@@ -392,14 +423,14 @@ div.stFormSubmitButton + div {
   align-items: baseline;
   gap: 10px;
   padding: 5px 0;
-  border-bottom: 1px solid rgba(51,65,85,0.25);
+  border-bottom: 1px solid var(--border-soft);
   font-size: 11px;
 }
 .event-row:last-child { border-bottom: none; }
 .event-date {
   font-family: 'Fira Code', monospace;
   font-size: 9px;
-  color: #334155;
+  color: var(--fg-muted);
   width: 68px;
   flex-shrink: 0;
 }
@@ -416,7 +447,7 @@ div.stFormSubmitButton + div {
   white-space: nowrap;
 }
 .event-detail {
-  color: #475569;
+  color: var(--fg-tertiary);
   font-size: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -438,33 +469,34 @@ div.stFormSubmitButton + div {
   font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: #475569;
+  color: var(--fg-tertiary);
   margin-bottom: 2px;
 }
 .day-number {
   font-family: 'Fira Code', monospace;
   font-size: 32px;
   font-weight: 700;
-  color: #F8FAFC;
+  color: var(--fg-primary);
   line-height: 1;
 }
 .day-date {
   font-family: 'Fira Code', monospace;
   font-size: 11px;
-  color: #64748B;
+  color: var(--fg-tertiary);
   margin-top: 3px;
 }
 .app-title {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.03em;
-  color: #F8FAFC;
+  color: var(--fg-primary);
 }
 .app-subtitle {
   font-size: 10px;
-  color: #475569;
+  color: var(--fg-tertiary);
   margin-top: 2px;
 }
+
 """
 
 

@@ -312,7 +312,7 @@ CREATE TABLE users (
 │         │           │  (Day Cycle)    │                        │
 │         └───────────┴─────────────────┘                        │
 │                                                                  │
-│  Ports: 8501 (Streamlit), 8000 (FastAPI)                       │
+│  Ports: 8501 (Streamlit), 8002 (FastAPI)                       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -953,7 +953,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose ports
-EXPOSE 8000 8501
+EXPOSE 8002 8501
 
 # Entry point
 CMD ["bash", "docker/entrypoint.sh"]
@@ -967,7 +967,7 @@ services:
   app:
     build: .
     ports:
-      - "8000:8000"   # FastAPI
+      - "8002:8002"   # FastAPI
       - "8501:8501"   # Streamlit
     volumes:
       - ./data:/app/data  # Persist SQLite database
@@ -990,7 +990,7 @@ fi
 # Run both services
 pip install &
 streamlit run dashboard/pages.py &
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8002
 
 wait
 ```
@@ -1007,8 +1007,8 @@ docker compose up --build
 
 # Access:
 # - Dashboard: http://localhost:8501
-# - API: http://localhost:8000
-# - Swagger Docs: http://localhost:8000/docs
+# - API: http://localhost:8002
+# - Swagger Docs: http://localhost:8002/docs
 ```
 
 ### 10.3 Environment Variables

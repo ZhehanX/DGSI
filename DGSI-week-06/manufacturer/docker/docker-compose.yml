@@ -7,7 +7,7 @@ services:
       dockerfile: docker/Dockerfile
     container_name: printer-factory-sim
     ports:
-      - "8000:8000"
+      - "8002:8002"
       - "8501:8501"
     volumes:
       - ./data:/app/data
