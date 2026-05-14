@@ -11,6 +11,7 @@
 - CLI: `provider-cli`
 - REST API: FastAPI with Swagger at `/docs`
 - Shared Service Layer: Typer CLI and FastAPI share the same `services/` logic.
+- **State Management**: Use `provider-cli export` and `provider-cli import <file>` for JSON state management.
 
 ## Manufacturer App Adaptation
 - Port: `8002` (from Week 5)

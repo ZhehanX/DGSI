@@ -31,6 +31,7 @@ The Provider's API was designed to be the single source of truth for its catalog
 *   **`GET /api/stock`**: Provides current inventory levels. While the Manufacturer typically uses the catalog, this endpoint is crucial for transparency during debugging and CLI inspection.
 *   **`POST /api/orders`**: The entry point for purchasing. It accepts a `product_id`, `quantity`, and `buyer` name. The Provider validates stock availability and calculates the `expected_delivery_day` based on current simulation time.
 *   **`GET /api/orders/{id}`**: A critical polling endpoint. The Manufacturer uses this to check if an order has transitioned to `DELIVERED`.
+*   **`GET/POST /api/export/import`**: Endpoints for full state management. These allow the entire simulation state (including the event log and sim day) to be dumped to or restored from JSON, facilitating reproducible testing and debugging.
 *   **`POST /api/day/advance`**: Synchronizes simulated time. Advancing time on the Provider triggers the state machine logic that moves orders from `PENDING` → `CONFIRMED` → `SHIPPED` → `DELIVERED`.
 
 **Rationale:** We chose a **polling pattern** (Manufacturer queries Provider) over a webhook/push notification system to minimize architectural complexity for this phase, ensuring that time advancement remains deterministic and human-driven.
@@ -56,6 +57,7 @@ We executed the "Ironclad Rule" scenario to verify the end-to-end integration:
 Building this distributed system through "vibe-coding"—leveraging Gemini/AI for high-speed prototyping—provided several insights into the future of agentic software engineering:
 
 *   **The Power of Static Anchors (What Went Well):** The AI was exceptional at boilerplate generation for FastAPI schemas, SQLAlchemy models, and Typer CLI commands. By using `prd.md` and `architecture.md` as "ground truth" anchors, the AI maintained high consistency across the separate Provider and Manufacturer codebases, drastically reducing the manual effort required for REST integration.
+*   **Gap Identification & Proactivity:** During the final verification phase, the AI identified that the JSON export/import functionality—while required by the checklist—was absent from the initial boilerplate. It was able to autonomously design and implement the logic for state serialization, database-wiping imports, and corresponding CLI commands, ensuring 100% compliance with the "ironclad" requirements.
 *   **The "Context Drift" Challenge (Where it Struggled):** While the AI excelled at structural code, it struggled with visual and semantic nuances. 
     *   **UI/UX Intuition:** It failed to solve accessibility issues like UI contrast, requiring manual human intervention.
     *   **Requirements Alignment:** Initial data modeling suggestions occasionally drifted from the specific business logic required for the 5-day scenario, necessitating iterative corrections.

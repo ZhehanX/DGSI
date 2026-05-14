@@ -111,6 +111,46 @@ def restock(product_id: int, quantity: int):
     typer.echo(f"Added {quantity} to product {product_id}")
     db.close()
 
+@app.command()
+def export(output: str = typer.Option("provider_state.json", help="Output JSON file path")):
+    """
+    Export the complete provider state to a JSON file.
+    """
+    from app.utils.json_export import export_full_state
+    import json
+    db = SessionLocal()
+    try:
+        state = export_full_state(db)
+        with open(output, "w") as f:
+            json.dump(state, f, indent=2)
+        typer.echo(f"Exported state to {output}")
+    finally:
+        db.close()
+
+@app.command("import")
+def import_command(file: str = typer.Argument(..., help="JSON file to import")):
+    """
+    Import a provider state from a JSON file.
+    WARNING: This will overwrite the current database!
+    """
+    from app.utils.json_export import import_full_state
+    import json
+    import os
+    if not os.path.exists(file):
+        typer.echo(f"File not found: {file}")
+        return
+    
+    db = SessionLocal()
+    try:
+        with open(file, "r") as f:
+            data = json.load(f)
+        result = import_full_state(db, data)
+        typer.echo(f"Imported state: {result}")
+    except Exception as e:
+        typer.echo(f"Import failed: {e}")
+    finally:
+        db.close()
+
 @day_app.command("advance")
 def day_advance():
     """
